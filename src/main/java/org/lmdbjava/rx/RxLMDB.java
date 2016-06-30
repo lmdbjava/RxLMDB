@@ -5,19 +5,33 @@ import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.lmdbjava.*;
 import rx.Observable;
+import rx.Subscriber;
+import rx.exceptions.OnErrorFailedException;
 
+import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.function.Function;
 
 public class RxLMDB {
 
   public static Observable<KeyVal<DirectBuffer>> scanForward(
-    Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
+    Txn<MutableDirectBuffer> tx,
+    Dbi<MutableDirectBuffer> db) {
     return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
   }
 
   public static Observable<KeyVal<DirectBuffer>> scanBackward(
-    Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
+    Txn<MutableDirectBuffer> tx,
+    Dbi<MutableDirectBuffer> db) {
     return scan(tx, db, cursor -> cursor.last(), cursor -> cursor.prev());
+  }
+
+  public static <T extends DirectBuffer> void batch(
+    Txn<MutableDirectBuffer> tx,
+    Dbi<MutableDirectBuffer> db,
+    Observable<List<KeyVal<T>>> values) {
+    BatchSubscriber putSubscriber = new BatchSubscriber(tx, db);
+    values.subscribe(putSubscriber);
   }
 
   private static Observable<KeyVal<DirectBuffer>> scan(
@@ -56,5 +70,50 @@ public class RxLMDB {
         tx.commit();
       }
     });
+  }
+
+
+  private static class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>> {
+    final Dbi<T> db;
+    final Cursor<T> cursor;
+    final Txn<T> tx;
+    final Env env;
+
+    private BatchSubscriber(Txn<T> tx, Dbi<T> db) {
+      this.env = db.getEnv();
+      this.tx = tx;
+      this.db = db;
+      this.cursor = db.openCursor(tx);
+    }
+
+    @Override
+    public void onCompleted() {
+    }
+
+    @Override
+    public void onError(Throwable e) {
+      System.err.println("Batch error");
+      e.printStackTrace(System.err);
+    }
+
+    @Override
+    public void onNext(List<KeyVal<T>> kvs) {
+      try {
+        if (kvs.size() < 1) {
+          return;
+        }
+        for (KeyVal<T> kv : kvs) {
+          try {
+            cursor.put(kv.key, kv.val);
+          } catch (Throwable e) {
+            // log error, swallow exception and proceed to next kv
+            System.err.println("Batch put error.");
+            e.printStackTrace(System.err);
+          }
+        }
+      } catch (Throwable e) {
+        throw new OnErrorFailedException(e);
+      }
+    }
   }
 }
