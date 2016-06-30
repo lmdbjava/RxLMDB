@@ -17,16 +17,15 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.lmdbjava.Env.create;
 import static org.lmdbjava.EnvFlags.MDB_NOSUBDIR;
-import static org.lmdbjava.MutableDirectBufferProxy.PROXY_MDB;
+import static org.lmdbjava.DirectBufferProxy.PROXY_MDB;
 import static org.lmdbjava.rx.TestUtil.kv;
-import static org.lmdbjava.rx.TestUtil.mdb;
 
 public class PutTest {
 
   @Rule
   public final TemporaryFolder tmp = new TemporaryFolder();
-  private Env<MutableDirectBuffer> env;
-  private Dbi<MutableDirectBuffer> db;
+  private Env<DirectBuffer> env;
+  private Dbi<DirectBuffer> db;
 
   @Before
   public void before() throws Exception {
@@ -47,13 +46,13 @@ public class PutTest {
           kv(1, 2),
           kv(3, 4)));
 
-    try (Txn<MutableDirectBuffer> tx = env.txnWrite()) {
+    try (Txn<DirectBuffer> tx = env.txnWrite()) {
       RxLMDB.batch(tx, db, Observable.from(kvs));
       Thread.sleep(100);
       tx.commit();
     }
 
-    try (Txn<MutableDirectBuffer> tx = env.txnRead()) {
+    try (Txn<DirectBuffer> tx = env.txnRead()) {
       List<KeyVal<DirectBuffer>> list = RxLMDB.scanForward(tx, db)
         .toList().toBlocking().first();
       assertThat(list.get(0).key.getInt(0), is(1));
