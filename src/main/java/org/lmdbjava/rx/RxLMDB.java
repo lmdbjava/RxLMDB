@@ -1,5 +1,6 @@
 package org.lmdbjava.rx;
 
+import org.agrona.DirectBuffer;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.lmdbjava.*;
@@ -9,17 +10,17 @@ import java.util.function.Function;
 
 public class RxLMDB {
 
-  public static Observable<KeyVal<MutableDirectBuffer>> scanForward(
+  public static Observable<KeyVal<DirectBuffer>> scanForward(
     Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
     return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
   }
 
-  public static Observable<KeyVal<MutableDirectBuffer>> scanBackward(
+  public static Observable<KeyVal<DirectBuffer>> scanBackward(
     Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
     return scan(tx, db, cursor -> cursor.last(), cursor -> cursor.prev());
   }
 
-  private static Observable<KeyVal<MutableDirectBuffer>> scan(
+  private static Observable<KeyVal<DirectBuffer>> scan(
     Txn<MutableDirectBuffer> tx,
     Dbi<MutableDirectBuffer> db,
     Function<Cursor<MutableDirectBuffer>, Boolean> first,
@@ -34,8 +35,8 @@ public class RxLMDB {
           }
           // important : buffer addresses are only valid within
           // lifetime of the transaction -> user must ensure this
-          MutableDirectBuffer key = new UnsafeBuffer(cursor.key());
-          MutableDirectBuffer val = new UnsafeBuffer(cursor.val());
+          DirectBuffer key = new UnsafeBuffer(cursor.key());
+          DirectBuffer val = new UnsafeBuffer(cursor.val());
           subscriber.onNext(new KeyVal<>(key, val));
           hasNext = next.apply(cursor);
         }

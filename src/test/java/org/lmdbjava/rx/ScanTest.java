@@ -1,5 +1,6 @@
 package org.lmdbjava.rx;
 
+import org.agrona.DirectBuffer;
 import org.agrona.MutableDirectBuffer;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +45,7 @@ public class ScanTest {
   @Test
   public void forwardScan() {
     try(Txn<MutableDirectBuffer> tx = env.txnRead()) {
-      List<KeyVal<MutableDirectBuffer>> list = RxLMDB.scanForward(tx, db)
+      List<KeyVal<DirectBuffer>> list = RxLMDB.scanForward(tx, db)
         .toList().toBlocking().first();
       assertThat(list.size(), is(5));
       assertThat(list.get(0).key.getInt(0), is(1));
@@ -63,7 +64,7 @@ public class ScanTest {
   @Test
   public void backwardScan() {
     try(Txn<MutableDirectBuffer> tx = env.txnRead()) {
-      List<KeyVal<MutableDirectBuffer>> list = RxLMDB.scanBackward(tx, db)
+      List<KeyVal<DirectBuffer>> list = RxLMDB.scanBackward(tx, db)
         .toList().toBlocking().first();
       assertThat(list.size(), is(5));
       assertThat(list.get(4).key.getInt(0), is(1));
