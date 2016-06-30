@@ -1,0 +1,14 @@
+target
+bin
+.classpath
+.project
+.settings
+.idea
+*.iml
+*~
+*.properties
+*.releaseBackup
+*.log
+*.tag
+*.next
+*.attach*
