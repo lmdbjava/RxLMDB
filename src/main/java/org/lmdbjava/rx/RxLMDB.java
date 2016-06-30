@@ -5,22 +5,39 @@ import org.agrona.concurrent.UnsafeBuffer;
 import org.lmdbjava.*;
 import rx.Observable;
 
+import java.util.function.Function;
+
 public class RxLMDB {
 
-  public static Observable<KeyVal<MutableDirectBuffer>> scan(
+  public static Observable<KeyVal<MutableDirectBuffer>> scanForward(
     Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
+    return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
+  }
+
+  public static Observable<KeyVal<MutableDirectBuffer>> scanBackward(
+    Txn<MutableDirectBuffer> tx, Dbi<MutableDirectBuffer> db) {
+    return scan(tx, db, cursor -> cursor.last(), cursor -> cursor.prev());
+  }
+
+  private static Observable<KeyVal<MutableDirectBuffer>> scan(
+    Txn<MutableDirectBuffer> tx,
+    Dbi<MutableDirectBuffer> db,
+    Function<Cursor<MutableDirectBuffer>, Boolean> first,
+    Function<Cursor<MutableDirectBuffer>, Boolean> next) {
     Cursor<MutableDirectBuffer> cursor = db.openCursor(tx);
     return Observable.create(subscriber -> {
       try {
-        boolean hasNext = cursor.first();
+        boolean hasNext = first.apply(cursor);
         while (hasNext) {
           if (subscriber.isUnsubscribed()) {
             return;
           }
+          // important : buffer addresses are only valid within
+          // lifetime of the transaction -> user must ensure this
           MutableDirectBuffer key = new UnsafeBuffer(cursor.key());
           MutableDirectBuffer val = new UnsafeBuffer(cursor.val());
           subscriber.onNext(new KeyVal<>(key, val));
-          hasNext = cursor.next();
+          hasNext = next.apply(cursor);
         }
 
         if (!subscriber.isUnsubscribed()) {

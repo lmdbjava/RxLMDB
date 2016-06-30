@@ -44,7 +44,7 @@ public class ScanTest {
   @Test
   public void forwardScan() {
     try(Txn<MutableDirectBuffer> tx = env.txnRead()) {
-      List<KeyVal<MutableDirectBuffer>> list = RxLMDB.scan(tx, db)
+      List<KeyVal<MutableDirectBuffer>> list = RxLMDB.scanForward(tx, db)
         .toList().toBlocking().first();
       assertThat(list.size(), is(5));
       assertThat(list.get(0).key.getInt(0), is(1));
@@ -57,6 +57,25 @@ public class ScanTest {
       assertThat(list.get(3).val.getInt(0), is(8));
       assertThat(list.get(4).key.getInt(0), is(9));
       assertThat(list.get(4).val.getInt(0), is(10));
+    }
+  }
+
+  @Test
+  public void backwardScan() {
+    try(Txn<MutableDirectBuffer> tx = env.txnRead()) {
+      List<KeyVal<MutableDirectBuffer>> list = RxLMDB.scanBackward(tx, db)
+        .toList().toBlocking().first();
+      assertThat(list.size(), is(5));
+      assertThat(list.get(4).key.getInt(0), is(1));
+      assertThat(list.get(4).val.getInt(0), is(2));
+      assertThat(list.get(3).key.getInt(0), is(3));
+      assertThat(list.get(3).val.getInt(0), is(4));
+      assertThat(list.get(2).key.getInt(0), is(5));
+      assertThat(list.get(2).val.getInt(0), is(6));
+      assertThat(list.get(1).key.getInt(0), is(7));
+      assertThat(list.get(1).val.getInt(0), is(8));
+      assertThat(list.get(0).key.getInt(0), is(9));
+      assertThat(list.get(0).val.getInt(0), is(10));
     }
   }
 }
