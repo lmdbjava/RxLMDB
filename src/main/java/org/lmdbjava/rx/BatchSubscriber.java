@@ -1,3 +1,22 @@
+/*-
+ * #%L
+ * RxLMDB
+ * %%
+ * Copyright (C) 2016 The LmdbJava Open Source Project
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 package org.lmdbjava.rx;
 
@@ -10,39 +29,45 @@ import org.lmdbjava.Txn;
 import rx.Subscriber;
 import rx.exceptions.OnErrorFailedException;
 
-class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>> {
+/**
+ * Batch subscriber.
+ *
+ * @param <T> buffer type
+ */
+final class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>> {
 
-  final Cursor<T> cursor;
-  final Dbi<T> db;
-  final Txn<T> tx;
+  private final Cursor<T> cursor;
 
-  BatchSubscriber(Txn<T> tx, Dbi<T> db) {
-    this.tx = tx;
-    this.db = db;
+  BatchSubscriber(final Txn<T> tx, final Dbi<T> db) {
+    super();
     this.cursor = db.openCursor(tx);
   }
 
   @Override
+  @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
   public void onCompleted() {
   }
 
   @Override
-  public void onError(Throwable e) {
+  @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
+  public void onError(final Throwable e) {
   }
 
   @Override
-  public void onNext(List<KeyVal<T>> kvs) {
+  @SuppressWarnings({"PMD.AvoidCatchingGenericException",
+                     "PMD.AvoidCatchingThrowable"})
+  public void onNext(final List<KeyVal<T>> kvs) {
     try {
-      if (kvs.size() < 1) {
+      if (kvs.isEmpty()) {
         return;
       }
-      for (KeyVal<T> kv : kvs) {
+      for (final KeyVal<T> kv : kvs) {
         try {
           cursor.put(kv.key(), kv.val());
-        } catch (RuntimeException ignored) {
+        } catch (final RuntimeException ignored) {
         }
       }
-    } catch (Throwable e) {
+    } catch (final Throwable e) {
       throw new OnErrorFailedException(e);
     }
   }

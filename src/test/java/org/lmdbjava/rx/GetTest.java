@@ -1,8 +1,27 @@
+/*-
+ * #%L
+ * RxLMDB
+ * %%
+ * Copyright (C) 2016 The LmdbJava Open Source Project
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 
 package org.lmdbjava.rx;
 
-import static com.jakewharton.byteunits.BinaryByteUnit.MEBIBYTES;
 import java.io.File;
+import java.io.IOException;
 import static java.util.Arrays.asList;
 import java.util.List;
 import org.agrona.DirectBuffer;
@@ -14,18 +33,18 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.lmdbjava.CursorIterator.KeyVal;
 import org.lmdbjava.Dbi;
-import static org.lmdbjava.DbiFlags.MDB_CREATE;
-import static org.lmdbjava.DirectBufferProxy.PROXY_DB;
 import org.lmdbjava.Env;
-import static org.lmdbjava.Env.create;
-import static org.lmdbjava.EnvFlags.MDB_NOSUBDIR;
 import org.lmdbjava.Txn;
 import static org.lmdbjava.rx.RxLMDB.get;
+import static org.lmdbjava.rx.TestUtil.createDbi;
+import static org.lmdbjava.rx.TestUtil.createEnv;
 import static org.lmdbjava.rx.TestUtil.mdb;
+import static org.lmdbjava.rx.TestUtil.verifyList;
 import rx.Observable;
 import static rx.Observable.from;
 
-public class GetTest {
+@SuppressWarnings("checkstyle:javadoctype")
+public final class GetTest {
 
   @Rule
   public final TemporaryFolder tmp = new TemporaryFolder();
@@ -33,28 +52,19 @@ public class GetTest {
   private Env<DirectBuffer> env;
 
   @Before
-  public void before() throws Exception {
+  public void before() throws IOException {
     final File path = tmp.newFile();
-    env = create(PROXY_DB)
-        .setMapSize(MEBIBYTES.toBytes(1))
-        .setMaxReaders(1)
-        .setMaxDbs(2)
-        .open(path, MDB_NOSUBDIR);
-    db = env.openDbi("test", MDB_CREATE);
-
-    db.put(mdb(1), mdb(2));
-    db.put(mdb(3), mdb(4));
-    db.put(mdb(5), mdb(6));
-    db.put(mdb(7), mdb(8));
-    db.put(mdb(9), mdb(10));
+    env = createEnv(path);
+    db = createDbi(env);
   }
 
   @Test
   public void getAll() {
-    try (Txn<DirectBuffer> tx = env.txnRead()) {
-      Observable<DirectBuffer> keys = from(asList(mdb(1), mdb(3), mdb(7)));
-      List<KeyVal<DirectBuffer>> list = get(tx, db, keys)
+    try (final Txn<DirectBuffer> tx = env.txnRead()) {
+      final Observable<DirectBuffer> keys = from(asList(mdb(1), mdb(3), mdb(7)));
+      final List<KeyVal<DirectBuffer>> list = get(tx, db, keys)
           .toList().toBlocking().first();
+      verifyList(list, 2); // only verifying first 2 (not 3) elements
       assertThat(list.size(), is(3));
       assertThat(list.get(0).key().getInt(0), is(1));
       assertThat(list.get(0).val().getInt(0), is(2));
