@@ -3,13 +3,11 @@ package org.lmdbjava.rx;
 import org.agrona.DirectBuffer;
 import org.agrona.MutableDirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
-import org.lmdbjava.KeyVal;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static java.lang.Integer.BYTES;
-import static java.nio.ByteBuffer.allocateDirect;
+import org.lmdbjava.CursorIterator.KeyVal;
 
 public class TestUtil {
 

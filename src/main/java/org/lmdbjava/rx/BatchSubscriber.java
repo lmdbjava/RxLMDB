@@ -6,15 +6,14 @@ import rx.Subscriber;
 import rx.exceptions.OnErrorFailedException;
 
 import java.util.List;
+import org.lmdbjava.CursorIterator.KeyVal;
 
 class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>> {
   final Dbi<T> db;
   final Cursor<T> cursor;
   final Txn<T> tx;
-  final Env env;
 
   BatchSubscriber(Txn<T> tx, Dbi<T> db) {
-    this.env = db.getEnv();
     this.tx = tx;
     this.db = db;
     this.cursor = db.openCursor(tx);
@@ -38,7 +37,7 @@ class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>
       }
       for (KeyVal<T> kv : kvs) {
         try {
-          cursor.put(kv.key, kv.val);
+          cursor.put(kv.key(), kv.val());
         } catch (Throwable e) {
           // log error, swallow exception and proceed to next kv
           System.err.println("Batch put error.");

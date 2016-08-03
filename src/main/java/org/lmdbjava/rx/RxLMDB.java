@@ -8,6 +8,7 @@ import rx.Subscriber;
 
 import java.util.List;
 import java.util.function.Function;
+import org.lmdbjava.CursorIterator.KeyVal;
 
 public class RxLMDB {
 
