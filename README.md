@@ -6,3 +6,18 @@
 # RxLMDB
 
 RxLMDB provide stateless [RxJava](https://github.com/ReactiveX/RxJava) wrapper functions to [lmdbjava](https://github.com/lmdbjava/lmdbjava).
+
+## Support
+
+Please [open a GitHub issue](https://github.com/lmdbjava/RxLMDB/issues)
+if you have any questions.
+
+## Contributing
+
+Contributions are welcome! Please see the LmdbJava project's
+[Contributing Guidelines](https://github.com/lmdbjava/lmdbjava/blob/master/CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the
+[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
