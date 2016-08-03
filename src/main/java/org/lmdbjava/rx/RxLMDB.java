@@ -1,23 +1,38 @@
-package org.lmdbjava.rx;
 
-import org.agrona.DirectBuffer;
-import org.agrona.concurrent.UnsafeBuffer;
-import org.lmdbjava.*;
-import rx.Observable;
-import rx.Subscriber;
+package org.lmdbjava.rx;
 
 import java.util.List;
 import java.util.function.Function;
+import org.agrona.DirectBuffer;
+import org.agrona.concurrent.UnsafeBuffer;
+import org.lmdbjava.Cursor;
 import org.lmdbjava.CursorIterator.KeyVal;
+import org.lmdbjava.Dbi;
+import static org.lmdbjava.GetOp.MDB_SET;
+import org.lmdbjava.Txn;
+import rx.Observable;
+import static rx.Observable.create;
+import rx.Subscriber;
 
 public class RxLMDB {
 
+  private RxLMDB() {
+  }
+
+  public static <T extends DirectBuffer> void batch(
+      Txn<DirectBuffer> tx,
+      Dbi<DirectBuffer> db,
+      Observable<List<KeyVal<T>>> values) {
+    BatchSubscriber putSubscriber = new BatchSubscriber(tx, db);
+    values.subscribe(putSubscriber);
+  }
+
   public static Observable<KeyVal<DirectBuffer>> get(
-    Txn<DirectBuffer> tx,
-    Dbi<DirectBuffer> db,
-    Observable<DirectBuffer> keys) {
+      Txn<DirectBuffer> tx,
+      Dbi<DirectBuffer> db,
+      Observable<DirectBuffer> keys) {
     Cursor<DirectBuffer> cursor = db.openCursor(tx);
-    return Observable.create(subscriber -> {
+    return create(subscriber -> {
       keys.subscribe(new Subscriber<DirectBuffer>() {
         @Override
         public void onCompleted() {
@@ -31,7 +46,7 @@ public class RxLMDB {
 
         @Override
         public void onNext(DirectBuffer key) {
-          if (cursor.get(key, GetOp.MDB_SET)) {
+          if (cursor.get(key, MDB_SET)) {
             // important : buffer addresses are only valid within
             // lifetime of the transaction -> user must ensure this
             DirectBuffer k = new UnsafeBuffer(cursor.key());
@@ -45,33 +60,25 @@ public class RxLMDB {
     });
   }
 
-  public static Observable<KeyVal<DirectBuffer>> scanForward(
-    Txn<DirectBuffer> tx,
-    Dbi<DirectBuffer> db) {
-    return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
-  }
-
   public static Observable<KeyVal<DirectBuffer>> scanBackward(
-    Txn<DirectBuffer> tx,
-    Dbi<DirectBuffer> db) {
+      Txn<DirectBuffer> tx,
+      Dbi<DirectBuffer> db) {
     return scan(tx, db, cursor -> cursor.last(), cursor -> cursor.prev());
   }
 
-  public static <T extends DirectBuffer> void batch(
-    Txn<DirectBuffer> tx,
-    Dbi<DirectBuffer> db,
-    Observable<List<KeyVal<T>>> values) {
-    BatchSubscriber putSubscriber = new BatchSubscriber(tx, db);
-    values.subscribe(putSubscriber);
+  public static Observable<KeyVal<DirectBuffer>> scanForward(
+      Txn<DirectBuffer> tx,
+      Dbi<DirectBuffer> db) {
+    return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
   }
 
   private static Observable<KeyVal<DirectBuffer>> scan(
-    Txn<DirectBuffer> tx,
-    Dbi<DirectBuffer> db,
-    Function<Cursor<DirectBuffer>, Boolean> first,
-    Function<Cursor<DirectBuffer>, Boolean> next) {
+      Txn<DirectBuffer> tx,
+      Dbi<DirectBuffer> db,
+      Function<Cursor<DirectBuffer>, Boolean> first,
+      Function<Cursor<DirectBuffer>, Boolean> next) {
     Cursor<DirectBuffer> cursor = db.openCursor(tx);
-    return Observable.create(subscriber -> {
+    return create(subscriber -> {
       try {
         boolean hasNext = first.apply(cursor);
         while (hasNext) {
@@ -102,4 +109,5 @@ public class RxLMDB {
       }
     });
   }
+
 }

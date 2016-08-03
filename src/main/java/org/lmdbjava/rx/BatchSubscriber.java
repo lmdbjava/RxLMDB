@@ -1,16 +1,19 @@
+
 package org.lmdbjava.rx;
 
+import java.util.List;
 import org.agrona.DirectBuffer;
-import org.lmdbjava.*;
+import org.lmdbjava.Cursor;
+import org.lmdbjava.CursorIterator.KeyVal;
+import org.lmdbjava.Dbi;
+import org.lmdbjava.Txn;
 import rx.Subscriber;
 import rx.exceptions.OnErrorFailedException;
 
-import java.util.List;
-import org.lmdbjava.CursorIterator.KeyVal;
-
 class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>> {
-  final Dbi<T> db;
+
   final Cursor<T> cursor;
+  final Dbi<T> db;
   final Txn<T> tx;
 
   BatchSubscriber(Txn<T> tx, Dbi<T> db) {
@@ -25,8 +28,6 @@ class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>
 
   @Override
   public void onError(Throwable e) {
-    System.err.println("Batch error");
-    e.printStackTrace(System.err);
   }
 
   @Override
@@ -38,10 +39,7 @@ class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyVal<T>>
       for (KeyVal<T> kv : kvs) {
         try {
           cursor.put(kv.key(), kv.val());
-        } catch (Throwable e) {
-          // log error, swallow exception and proceed to next kv
-          System.err.println("Batch put error.");
-          e.printStackTrace(System.err);
+        } catch (RuntimeException ignored) {
         }
       }
     } catch (Throwable e) {
