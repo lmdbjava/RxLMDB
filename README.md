@@ -17,6 +17,11 @@ if you have any questions.
 Contributions are welcome! Please see the LmdbJava project's
 [Contributing Guidelines](https://github.com/lmdbjava/lmdbjava/blob/master/CONTRIBUTING.md).
 
+## Snapshots
+
+Travis CI automatically publishes snapshot releases to the
+[OSS Sonatype Snapshots Repository](https://oss.sonatype.org/content/repositories/snapshots/org/lmdbjava/rxlmdb).
+
 ## License
 
 This project is licensed under the
