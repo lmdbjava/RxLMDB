@@ -4,9 +4,9 @@ cache:
 language: java
 jdk: oraclejdk8
 install:
-  - mvn -B -Pdeploy -V dependency:go-offline
+  - mvn -B -Pdeploy --settings .travis-settings.xml -V dependency:go-offline
 script:
-  - mvn -B -Pdeploy -Dgpg.skip=true verify
+  - mvn -B -Pdeploy --settings .travis-settings.xml -Dgpg.skip=true verify
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then echo $GPG_KEY | base64 --decode | gpg --batch --fast-import -; fi
