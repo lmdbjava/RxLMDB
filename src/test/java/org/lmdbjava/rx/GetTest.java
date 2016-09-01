@@ -60,7 +60,7 @@ public final class GetTest {
 
   @Test
   public void getAll() {
-    try (final Txn<DirectBuffer> tx = env.txnRead()) {
+    try (Txn<DirectBuffer> tx = env.txnRead()) {
       final Observable<DirectBuffer> keys = from(asList(mdb(1), mdb(3), mdb(7)));
       final List<KeyVal<DirectBuffer>> list = get(tx, db, keys)
           .toList().toBlocking().first();

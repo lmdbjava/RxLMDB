@@ -50,7 +50,7 @@ public final class ScanTest {
 
   @Test
   public void backwardScan() {
-    try (final Txn<DirectBuffer> tx = env.txnRead()) {
+    try (Txn<DirectBuffer> tx = env.txnRead()) {
       final List<KeyVal<DirectBuffer>> list
           = scanBackward(tx, db).toList().toBlocking().first();
       assertThat(list.size(), is(5));
@@ -76,7 +76,7 @@ public final class ScanTest {
 
   @Test
   public void forwardScan() {
-    try (final Txn<DirectBuffer> tx = env.txnRead()) {
+    try (Txn<DirectBuffer> tx = env.txnRead()) {
       final List<KeyVal<DirectBuffer>> list = scanForward(tx, db)
           .toList().toBlocking().first();
       verifyList(list, 5);
