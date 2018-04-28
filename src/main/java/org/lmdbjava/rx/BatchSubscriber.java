@@ -44,12 +44,10 @@ final class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyV
   }
 
   @Override
-  @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
   public void onCompleted() {
   }
 
   @Override
-  @SuppressWarnings("PMD.UncommentedEmptyMethodBody")
   public void onError(final Throwable e) {
   }
 
