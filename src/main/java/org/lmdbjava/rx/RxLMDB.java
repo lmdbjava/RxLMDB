@@ -50,6 +50,7 @@ public final class RxLMDB {
     values.subscribe(putSubscriber);
   }
 
+  @SuppressWarnings("PMD.CloseResource")
   public static Observable<KeyVal<DirectBuffer>> get(
       final Txn<DirectBuffer> tx,
       final Dbi<DirectBuffer> db,
@@ -73,7 +74,7 @@ public final class RxLMDB {
   }
 
   @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops",
-                     "PMD.AvoidCatchingThrowable"})
+                     "PMD.AvoidCatchingThrowable", "PMD.CloseResource"})
   private static Observable<KeyVal<DirectBuffer>> scan(
       final Txn<DirectBuffer> tx,
       final Dbi<DirectBuffer> db,
