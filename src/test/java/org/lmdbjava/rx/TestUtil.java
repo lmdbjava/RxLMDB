@@ -21,26 +21,28 @@
 package org.lmdbjava.rx;
 
 import static com.jakewharton.byteunits.BinaryByteUnit.MEBIBYTES;
-import java.io.File;
-import java.io.IOException;
 import static java.lang.Long.BYTES;
-import java.nio.ByteBuffer;
 import static java.nio.ByteBuffer.allocateDirect;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
-import java.util.List;
-import org.agrona.DirectBuffer;
-import org.agrona.MutableDirectBuffer;
-import org.agrona.concurrent.UnsafeBuffer;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import org.lmdbjava.CursorIterator.KeyVal;
-import org.lmdbjava.Dbi;
 import static org.lmdbjava.DbiFlags.MDB_CREATE;
 import static org.lmdbjava.DirectBufferProxy.PROXY_DB;
-import org.lmdbjava.Env;
 import static org.lmdbjava.Env.create;
 import static org.lmdbjava.EnvFlags.MDB_NOSUBDIR;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.List;
+
+import org.agrona.DirectBuffer;
+import org.agrona.MutableDirectBuffer;
+import org.agrona.concurrent.UnsafeBuffer;
+import org.lmdbjava.CursorIterator.KeyVal;
+import org.lmdbjava.Dbi;
+import org.lmdbjava.Env;
 
 /**
  * Utility methods for use in the test package.

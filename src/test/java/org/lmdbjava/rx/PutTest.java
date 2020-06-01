@@ -20,11 +20,19 @@
 
 package org.lmdbjava.rx;
 
-import java.io.File;
-import java.io.IOException;
 import static java.lang.Thread.sleep;
 import static java.util.Arrays.asList;
+import static org.lmdbjava.DbiFlags.MDB_CREATE;
+import static org.lmdbjava.rx.RxLMDB.scanForward;
+import static org.lmdbjava.rx.TestUtil.createEnv;
+import static org.lmdbjava.rx.TestUtil.kv;
+import static org.lmdbjava.rx.TestUtil.verifyList;
+import static rx.Observable.from;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+
 import org.agrona.DirectBuffer;
 import org.junit.Before;
 import org.junit.Rule;
@@ -32,14 +40,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.lmdbjava.CursorIterator.KeyVal;
 import org.lmdbjava.Dbi;
-import static org.lmdbjava.DbiFlags.MDB_CREATE;
 import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
-import static org.lmdbjava.rx.RxLMDB.scanForward;
-import static org.lmdbjava.rx.TestUtil.createEnv;
-import static org.lmdbjava.rx.TestUtil.kv;
-import static org.lmdbjava.rx.TestUtil.verifyList;
-import static rx.Observable.from;
 
 @SuppressWarnings("checkstyle:JavadocType")
 public final class PutTest {

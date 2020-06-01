@@ -20,12 +20,19 @@
 
 package org.lmdbjava.rx;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.lmdbjava.rx.RxLMDB.scanBackward;
+import static org.lmdbjava.rx.RxLMDB.scanForward;
+import static org.lmdbjava.rx.TestUtil.createDbi;
+import static org.lmdbjava.rx.TestUtil.createEnv;
+import static org.lmdbjava.rx.TestUtil.verifyList;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 import org.agrona.DirectBuffer;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,11 +41,6 @@ import org.lmdbjava.CursorIterator.KeyVal;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Env;
 import org.lmdbjava.Txn;
-import static org.lmdbjava.rx.RxLMDB.scanBackward;
-import static org.lmdbjava.rx.RxLMDB.scanForward;
-import static org.lmdbjava.rx.TestUtil.createDbi;
-import static org.lmdbjava.rx.TestUtil.createEnv;
-import static org.lmdbjava.rx.TestUtil.verifyList;
 
 @SuppressWarnings("checkstyle:JavadocType")
 public final class ScanTest {

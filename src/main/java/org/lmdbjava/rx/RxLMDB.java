@@ -20,17 +20,19 @@
 
 package org.lmdbjava.rx;
 
+import static org.lmdbjava.GetOp.MDB_SET;
+import static rx.Observable.create;
+
 import java.util.List;
 import java.util.function.Function;
+
 import org.agrona.DirectBuffer;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.lmdbjava.Cursor;
 import org.lmdbjava.CursorIterator.KeyVal;
 import org.lmdbjava.Dbi;
-import static org.lmdbjava.GetOp.MDB_SET;
 import org.lmdbjava.Txn;
 import rx.Observable;
-import static rx.Observable.create;
 import rx.Subscriber;
 
 /**
