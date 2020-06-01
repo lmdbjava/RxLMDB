@@ -36,7 +36,7 @@ import rx.Subscriber;
 /**
  * Main class.
  */
-@SuppressWarnings("checkstyle:abbreviationaswordinname")
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public final class RxLMDB {
 
   private RxLMDB() {
@@ -50,7 +50,6 @@ public final class RxLMDB {
     values.subscribe(putSubscriber);
   }
 
-  @SuppressWarnings("PMD.CloseResource")
   public static Observable<KeyVal<DirectBuffer>> get(
       final Txn<DirectBuffer> tx,
       final Dbi<DirectBuffer> db,
@@ -73,8 +72,7 @@ public final class RxLMDB {
     return scan(tx, db, cursor -> cursor.first(), cursor -> cursor.next());
   }
 
-  @SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops",
-                     "PMD.AvoidCatchingThrowable", "PMD.CloseResource"})
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   private static Observable<KeyVal<DirectBuffer>> scan(
       final Txn<DirectBuffer> tx,
       final Dbi<DirectBuffer> db,

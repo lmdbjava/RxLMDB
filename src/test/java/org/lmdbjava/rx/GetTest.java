@@ -43,7 +43,7 @@ import static org.lmdbjava.rx.TestUtil.verifyList;
 import rx.Observable;
 import static rx.Observable.from;
 
-@SuppressWarnings("checkstyle:javadoctype")
+@SuppressWarnings("checkstyle:JavadocType")
 public final class GetTest {
 
   @Rule

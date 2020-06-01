@@ -52,8 +52,7 @@ final class BatchSubscriber<T extends DirectBuffer> extends Subscriber<List<KeyV
   }
 
   @Override
-  @SuppressWarnings({"PMD.AvoidCatchingGenericException",
-                     "PMD.AvoidCatchingThrowable"})
+  @SuppressWarnings("PMD.AvoidCatchingThrowable")
   public void onNext(final List<KeyVal<T>> kvs) {
     try {
       if (kvs.isEmpty()) {

@@ -40,7 +40,7 @@ import static org.lmdbjava.rx.TestUtil.createDbi;
 import static org.lmdbjava.rx.TestUtil.createEnv;
 import static org.lmdbjava.rx.TestUtil.verifyList;
 
-@SuppressWarnings("checkstyle:javadoctype")
+@SuppressWarnings("checkstyle:JavadocType")
 public final class ScanTest {
 
   @Rule

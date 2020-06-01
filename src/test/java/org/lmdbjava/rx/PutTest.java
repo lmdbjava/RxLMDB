@@ -41,7 +41,7 @@ import static org.lmdbjava.rx.TestUtil.kv;
 import static org.lmdbjava.rx.TestUtil.verifyList;
 import static rx.Observable.from;
 
-@SuppressWarnings("checkstyle:javadoctype")
+@SuppressWarnings("checkstyle:JavadocType")
 public final class PutTest {
 
   @Rule
